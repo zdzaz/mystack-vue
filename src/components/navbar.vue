@@ -6,13 +6,14 @@
                 <img src='../assets/logo.png'>
                 </a>
             </div>
-
             <div class="navbar-menu">
+                
                 <div class="navbar-start" >
                     <div class="navbar-item has-dropdown-up is-hoverable">
                         <a class="navbar-link">
                         Projects
-                        <b-tag>
+                        <b-tag v-if="user.project">
+                            
                             {{user.project.name}}
                         </b-tag>
                         </a>
@@ -26,7 +27,7 @@
                         </a>
                         </div>
                     </div>
-
+                    
                     <a class="navbar-item" @click="home()">
                         Dashboard
                     </a>

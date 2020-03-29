@@ -4,10 +4,12 @@ import VueAxios from 'vue-axios'
 import VueRouter from 'vue-router'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
+import VueClipboard from 'vue-clipboard2'
 
-axios.defaults.timeout = 5000;
-Vue.use(VueAxios, axios)
 
+axios.defaults.timeout = 55000;
+Vue.use(VueAxios, axios);
+Vue.use(VueClipboard);
 
 //Components
 import App from './App.vue'
