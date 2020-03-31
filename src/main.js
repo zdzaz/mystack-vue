@@ -5,7 +5,10 @@ import VueRouter from 'vue-router'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import VueClipboard from 'vue-clipboard2'
+import VueApexCharts from 'vue-apexcharts'
 
+Vue.use(VueApexCharts)
+Vue.component('apexchart', VueApexCharts)
 
 axios.defaults.timeout = 55000;
 Vue.use(VueAxios, axios);
@@ -19,6 +22,8 @@ import CreateServer from './components/servers/create.vue'
 import Images from './components/images/index.vue'
 import CreateImage from './components/images/create.vue'
 import Flavors from './components/flavors/index.vue'
+import Volumes from './components/volumes/index.vue'
+import CreateVolume from './components/volumes/create.vue'
 // import CreateFlavor from './components/flavors/create.vue'
 
 
@@ -55,6 +60,14 @@ const routes = [
   {
     path: '/home/flavors',
     component: Flavors
+  },
+  {
+    path: '/home/volumes',
+    component: Volumes
+  },
+  {
+    path: '/home/volumes/create',
+    component: CreateVolume
   },
 ];
 

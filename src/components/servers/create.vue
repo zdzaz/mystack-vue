@@ -310,7 +310,58 @@
                                     </b-radio-button>
                                 </b-field>
                             </div>
-                            <!-- FROM IMAGE -->
+                            <!-- FROM Bootable Volume -->
+                            <div v-if="selectedStartup=='volume'" class="columns">
+                                <b-field label="Volume pick" label-position='' class="column" >
+                                    <b-select placeholder="Select a bootable volume" v-model="selectedBootableVolume" expanded>
+                                        <option
+                                            v-for="volume in filteredBootableVolumes"
+                                            :value="volume"
+                                            :key="volume.id"
+                                            >
+                                            {{ volume.name == '' ? volume.id : volume.name }}
+                                        </option>
+                                    </b-select>
+                                </b-field>
+                                <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                    <div v-if="selectedBootableVolume" class="">
+                                        <div class="">
+                                            <b-field label="Status" label-position='' class="column">
+                                                <span :style="selectedBootableVolume.status=='available'?'color:green':'color:red'">{{selectedBootableVolume.status}}</span>
+                                            </b-field>
+                                        </div>
+                                    </div>
+                                </b-field>
+                                <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                    <div v-if="selectedBootableVolume" class="">
+                                        <div class="">
+                                            <b-field  label="Image" label-position='' class="column">
+                                                <span v-if="selectedBootableVolume.volume_image_metadata">{{selectedBootableVolume.volume_image_metadata.image_name}}</span>
+                                            </b-field>
+                                        </div>
+                                    </div>
+                                </b-field>
+                                    <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                    <div v-if="selectedBootableVolume" class="">
+                                        <div class="">
+                                            <b-field label="Size" label-position='' class="column">
+                                                <span>{{selectedVolume.size}}GB</span>
+                                            </b-field>
+                                        </div>
+                                        </div>
+                                </b-field>
+                                <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                    <div v-if="selectedBootableVolume" class="">
+                                        <div class="">
+                                            <b-field label="Name" label-position='' class="column">
+                                                <span>{{selectedVolume.name==''||selectedVolume.name==null?'-':selectedVolume.name}}</span>
+                                            </b-field>
+                                        </div>
+                                    </div>
+                                </b-field>
+                            </div>
+                            
+
                             <b-collapse
                                 v-if="selectedStartup=='image'"
                                 class="card highlight0"
@@ -407,7 +458,7 @@
                                         </span>
                                     </div>
                                     <span v-if="createNewVolume=='yes'" class="">
-                                        <b-field label="Volume Size (B)" label-position='' class="column is-half">
+                                        <b-field label="Volume Size (GB)" label-position='' class="column is-one-quarter">
                                             <b-input type="number" v-model="newVolume.size"></b-input>
                                         </b-field>
                                     </span>
@@ -415,19 +466,37 @@
                                         <b-field label="Volume pick" label-position='' class="column" >
                                             <b-select placeholder="Select a image" v-model="selectedVolume" expanded>
                                                 <option
-                                                    v-for="volume in volumes"
+                                                    v-for="volume in filteredNotBootableVolumes"
                                                     :value="volume"
                                                     :key="volume.id"
                                                     >
-                                                    {{ volume.name }}
+                                                    {{ volume.name == '' || volume.name == null ? volume.id : volume.name }}
                                                 </option>
                                             </b-select>
                                         </b-field>
                                         <b-field style="padding-top:20px; padding-left:20px" class="column">
                                             <div v-if="selectedVolume" class="">
-                                                <div class=" columns">
+                                                <div class="">
                                                     <b-field label="Status" label-position='' class="column">
-                                                        <span :style="selectedImage.status=='active'?'color:green':'color:red'">{{selectedVolume.name}}</span>
+                                                        <span :style="selectedVolume.status=='available'?'color:green':'color:red'">{{selectedVolume.status}}</span>
+                                                    </b-field>
+                                                </div>
+                                            </div>
+                                        </b-field>
+                                         <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                            <div v-if="selectedVolume" class="">
+                                                <div class="">
+                                                    <b-field label="Size" label-position='' class="column">
+                                                        <span>{{selectedVolume.size}}GB</span>
+                                                    </b-field>
+                                                </div>
+                                                </div>
+                                        </b-field>
+                                         <b-field style="padding-top:20px; padding-left:20px" class="column">
+                                            <div v-if="selectedVolume" class="">
+                                                <div class="">
+                                                    <b-field label="Name" label-position='' class="column">
+                                                        <span>{{selectedVolume.name==''||selectedVolume.name==null?'-':selectedVolume.name}}</span>
                                                     </b-field>
                                                 </div>
                                             </div>
@@ -468,6 +537,7 @@ export default {
         'hypervisors'
     ],
     data: () => ({
+        data:{},
         loading:false,
         isOpen: 0,
         index:0,
@@ -482,6 +552,7 @@ export default {
         createNewVolume:'',
         selectedImage:'',
         selectedVolume:'',
+        selectedBootableVolume:'',
         volumes_dummy:[{name:'vol1'},{name:'vol2'}],
         selectedAvailabilityZone:{},
         selectedHost:{},
@@ -500,9 +571,7 @@ export default {
         // To check the progress of the request, make a GET /servers/{id} request. This call returns a progress attribute, which is a percentage value from 0 to 100.
         //The Location header returns the full URL to the newly created server and is available as a self and bookmark link in the server representation.
         createServer(){
-            
             this.loading = true
-
 
             if(!this.newServer.name){
                 this.error("Invalid server name");
@@ -521,7 +590,7 @@ export default {
                 return;
             }
 
-            var data = {
+            this.data = {
                 'server':{
                     'name':this.newServer.name,
                     'flavorRef':this.selectedFlavor,
@@ -529,15 +598,15 @@ export default {
             }
 
             if(this.newServer.adminPass){
-                data.server.adminPass = this.newServer.adminPass;
+                this.data.server.adminPass = this.newServer.adminPass;
             }
             
             if(this.newServer.description){
-                data.server.description = this.newServer.description;
+                this.data.server.description = this.newServer.description;
             }
 
             if(this.selectedAvailabilityZone!=''){
-                data.server.availability_zone = this.selectedAvailabilityZone;
+                this.data.server.availability_zone = this.selectedAvailabilityZone;
             }
 
             if(this.multipleServers=='yes'){
@@ -547,25 +616,25 @@ export default {
                     return;
 
                 }
-                data.server.min_count = this.min_count>=1?this.min_count:1;
-                data.server.max_count = this.max_count>=1?this.max_count:1;
+                this.data.server.min_count = this.min_count>=1?this.min_count:1;
+                this.data.server.max_count = this.max_count>=1?this.max_count:1;
             }
 
-            data.server.networks=[];
+            this.data.server.networks=[];
 
             this.selectedNetworks.forEach((n)=>{
                 var network = {
                     'uuid':n.id,
                 }
-                data.server.networks.push(network)
+                this.data.server.networks.push(network)
             });
 
             if(this.newServer.accessIPv4){
-                data.server.accessIPv4 = this.newServer.accessIPv4;
+               this.data.server.accessIPv4 = this.newServer.accessIPv4;
             }
 
             if(this.newServer.accessIPv6){
-                data.server.accessIPv6 = this.newServer.accessIPv6;
+                this.data.server.accessIPv6 = this.newServer.accessIPv6;
             } 
             
             if(this.chooseNetwork=="auto"){
@@ -575,14 +644,152 @@ export default {
             }
 
             if(this.selectedStartup=='image'){
-                data.server.imageRef=this.selectedImage.id;
+                
+                if(!this.selectedImage){
+                    this.error("Invalid - Select Image");
+                    this.loading = false
+                    return;
+                }
+
+                this.data.server.imageRef = this.selectedImage.id;
+
+                if(this.createNewVolume=='yes'){
+
+                    var dataVolume = {
+                        "project": {
+                            "size":this.newServer.volumeSize
+                        }
+                    }
+
+                    this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/volume/v3/'+this.user.project.id+'/volumes',dataVolume,
+                    {
+                        headers: { 
+                            'x-auth-token': this.user.token
+                        }
+
+                    }).then(response => {
+                        console.log(response)
+
+                        this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers',this.data,
+                        {
+                            headers: { 
+                                'x-auth-token': this.user.token
+                            }
+                        }).then(response => {
+                                console.log(response);
+
+                                // especificar volume block_device_mapping_v2 , exemplo
+                                // "block_device_mapping_v2": [{
+                                //     "boot_index": "0",
+                                //     "uuid": "ac408821-c95a-448f-9292-73986c790911",
+                                //     "source_type": "image",
+                                //     "volume_size": "25",
+                                //     "destination_type": "volume",
+                                //     "delete_on_termination": true,
+                                //     "tag": "disk1",
+                                //     "disk_bus": "scsi"}]
+
+                                this.$router.push("/home/servers");
+                                this.loading = false
+                        }).catch(response => {
+                            console.log(response);
+                            var error_message = "Somethign went wrong...";
+                            this.$toasted.error(error_message, { 
+                                theme: "outline", 
+                                position: "top-right", 
+                                duration : 5000
+                            });
+                            this.loading = false
+                        });
+
+
+                    }).catch(error => {
+                        console.log(error)
+                        this.$toasted.error("Could not create volume", { 
+                            theme: "outline", 
+                            position: "top-right", 
+                            duration : 5000
+                            });
+                            this.loading = false;
+                    });
+
+                } else{
+                    this.createServerWithImageFromVolume();
+                }
+
+            } else{
+                this.createServerFromBootableVolume();
+            }   
+
+        },
+        createServerWithImageFromVolume(){
+            
+            if(!this.selectedVolume || this.selectedVolume.bootable == true || this.selectedVolume.bootable == 'true'){
+                this.error("Invalid - Select a non bootable volume");
+                this.loading = false
+                return;
             }
 
-            if(this.createNewVolume=='yes'){
-                // Criar novo volume!!! com o tamanho this.newVolume.size
+            if(this.selectedVolume.status != 'available'){
+                this.error("Invalid - Select an available non bootable volume");
+                this.loading = false
+                return;
             }
+
+            this.data.server.block_device_mapping_v2 = [{
+                "boot_index": "0",
+                "uuid": this.selectedVolume.id,
+                "source_type": "volume",
+                "destination_type": "volume",
+                "delete_on_termination": false,
+            }];
+
+            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers',this.data,
+            {
+                headers: { 
+                    'x-auth-token': this.user.token
+                }
+            }).then(response => {
+                    console.log(response);
+                    this.$router.push("/home/servers");
+                    this.loading = false
+            }).catch(response => {
+                console.log(response);
+                var error_message = "Somethign went wrong...";
+                this.$toasted.error(error_message, { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                });
+                this.loading = false
+            });
+        },
+        createServerFromBootableVolume(){
+
+            if(!this.selectedBootableVolume || this.selectedBootableVolume.bootable == false || this.selectedBootableVolume.bootable == 'false'){
+                this.error("Invalid - Select a bootable volume");
+                this.loading = false
+                return;
+            }
+
+            if(this.selectedBootableVolume.status != 'available'){
+                this.error("Invalid - Select an available volume");
+                this.loading = false
+                return;
+            }
+
+           
+            this.data.server.block_device_mapping_v2 = [{
+                "boot_index": "0",
+                "uuid": this.selectedBootableVolume.id,
+                "source_type": "volume",
+                "destination_type": "volume",
+                "delete_on_termination": false
+            }];
+
             
-            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers',data,
+
+            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers',this.data,
             {
                 headers: { 
                     'x-auth-token': this.user.token
@@ -613,7 +820,6 @@ export default {
                 });
         },
         getSubnetworkDetails(network_id, subnetworks){
-
             if(subnetworks.length>0){
                 this.networks.find(x=> x.id===network_id)['subnetwork_details']=[];
             } else{
@@ -638,9 +844,10 @@ export default {
                         duration : 5000
                         });
                 });
-
-
             });
+        },
+        getVolumesAgain(){
+            this.$emit('getVolumesAgain');
         },
         
     },
@@ -649,10 +856,20 @@ export default {
             return this.flavors.filter(obj => {
                 return obj.id === this.selectedFlavor;
             })
+        },
+        filteredNotBootableVolumes(){
+            return this.volumes.filter(obj => {
+                return obj.bootable == "false";
+            })
+        },
+        filteredBootableVolumes(){
+            return this.volumes.filter(obj => {
+                return obj.bootable == "true";
+            })
         }
     },
     mounted(){
-
+        this.getVolumesAgain();
     }
 }
 </script>

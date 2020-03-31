@@ -40,8 +40,8 @@
       </b-button>
     </div>
     <div v-else>
-      <span v-if="!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
-        <router-view :key="servers.length" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
+      <span v-if="!loadingVolumes&&!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
+        <router-view :key="servers.length" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
         <mynavbar :ip="ip" :user="user" :projects="projects" :servers="servers" @switchproject="switchProject"></mynavbar>
       </span>
       <span v-else>
@@ -63,6 +63,7 @@ export default {
   },
   data: () => ({
     loading:false,
+    loadingVolumes:false,
     loadingFlavors:false,
     loadingHypervisors:false,
     loadingImages:false,
@@ -74,7 +75,7 @@ export default {
     loadingDeleteServer:false,
     loadingEdit:false,
     credentials:{
-      name:"demo",
+      name:"admin",
       password:"StrongAdminSecret",
       token: "",
     },
@@ -84,6 +85,7 @@ export default {
     flavors:{},
     networks:{},
     images:{},
+    volumes:[],
     availabilityZones:[],
     hypervisors:[],
     ip:[127,0,0,1],
@@ -158,6 +160,7 @@ export default {
             this.getNetworks();
             this.getImages();
             this.getZones();
+            this.getVolumes();
             this.getHypervisors();
             this.connected=true;
             
@@ -217,6 +220,7 @@ export default {
         this.getImages();
         this.getZones();
         this.getHypervisors();
+        this.getVolumes();
         this.$router.push("/home");
         this.$toasted.success("Switched project scope!", { 
           theme: "outline", 
@@ -442,6 +446,45 @@ export default {
                 });
                 this.loadingEdit = false;
         });
+    },
+    getVolumes(){
+      this.loadingVolumes = true;
+      this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/volume/v3/'+this.user.project.id+'/volumes/detail',
+        {
+            headers: { 
+                'x-auth-token': this.user.token
+            }
+        }).then(response => {
+            this.volumes = response.data.volumes;
+            this.loadingVolumes = false;
+        }).catch(error => {
+            console.log(error)
+            this.$toasted.error("No volumes could be reached!", { 
+                theme: "outline", 
+                position: "top-right", 
+                duration : 5000
+                });
+                this.loadingVolumes = false;
+        });
+
+    },
+    getVolumesAgain(){
+      this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/volume/v3/'+this.user.project.id+'/volumes/detail',
+        {
+          headers: { 
+              'x-auth-token': this.user.token
+          }
+        }).then(response => {
+            this.volumes = response.data.volumes;
+        }).catch(error => {
+            console.log(error)
+            this.$toasted.error("No volumes could be reached!", { 
+                theme: "outline", 
+                position: "top-right", 
+                duration : 5000
+                });
+        });
+
     },
 
   },

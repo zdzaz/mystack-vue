@@ -55,7 +55,7 @@
                                     </b-select>
                                 </b-field>
                                 <b-field style="padding-top:45px" label="" class="file column is-one-fifth">
-                                    <b-upload v-model="newImage.selectedFile">
+                                    <b-upload v-model="newImage.selectedFile" type="file" id="files" ref="files" @change="handleFileUpload()">
                                         <a class="button is-dark">
                                             <b-icon icon="upload"></b-icon>
                                             <span>Click to upload File</span>
@@ -129,10 +129,7 @@
                                 </div>
                             </div>
                         </b-collapse>
-        
-                        
                     </div>
-                    
                 </b-collapse>
             </div>
         </section>
@@ -162,6 +159,7 @@ export default {
         loading:false,
         isOpen: 0,
         index:0,
+        file:'',
         fabActions: [
             {
                 name: 'alert',
@@ -196,31 +194,37 @@ export default {
         ]
     }),
     methods: {
+        handleFileUpload(){
+            this.file = this.$refs.file.files[0];
+        },
         createImage(){
             this.loading = true;
+
             // LOCATION HEADER to send file?
             //dont have permissions to create image owner none
 
-            var data = {
+            var data = { "image":{
                     'name':this.newImage.name,
                     'disk_format':this.newImage.selectedDiskFormat,
                     'min_ram':this.newImage.min_ram==''?0:Number(this.newImage.min_ram),
                     'min_disk':this.newImage.min_disk==''?0:Number(this.newImage.min_disk),
                     'visibility':this.newImage.selectedVisibility,
                     'protection':this.newImage.selectedProtection=='true'?true:false,
-                    'description': this.newImage.description,
+                    'description': this.newImage.description
+                }
             }
 
             console.log(data)
             this.json = data;
-            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images',data.image,
+            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images',data,
             {
                 headers: { 
-                    'x-auth-token': this.user.token
+                    'x-auth-token': this.user.token,
+                    'location':this.file
                 }
             }).then(response => {
-                    console.log("Created Image");
                     console.log(response);
+                    this.$router.push("/home/images");
 
             }).catch(response => {
                 console.log(response);

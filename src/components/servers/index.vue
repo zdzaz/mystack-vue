@@ -38,7 +38,7 @@
                 
                 <b-carousel-list repeat v-model="current" :data="filteredServers" :has-drag="false" :items-to-show="5" style="padding-bottom:30px">
                     <template slot="item" slot-scope="server">
-                        <div :class="server.index==current?'up':'down'" class="card"  @click="server.index==current?'':info(server.index,server)">
+                        <div :class="server.index==current?'up':'down'" class="card" @dblclick="toggleActionServer=true"  @click="server.index==current?'':info(server.index,server)">
                             <div class="card-image">
                                 <figure class="image is-5by4">
                                     <img src="../../assets/vm.png">
@@ -74,13 +74,50 @@
                     <button class="button" type="button" @click="bulk_delete=false">Close</button>
                     <button  class="button is-danger"  @click.prevent.stop="bulkDelete()">Bulk Delete</button>
                 </div>
-                
             </div>
         </section>
+        
+        
+
         <section v-if="current>=0">
+
+            <!-- <span ref="fip">
+            </span>
+            <section  v-if="floatingAddrToggle">
+                <div class="container" style="padding-bottom:40px;padding-left:30px;padding-top:30px">
+                    <div class="columns">
+                        <div class="column">
+                            <b class="is-size-3	">Assign Floating IP address</b> 
+                        </div>
+                    </div>
+                    <section class="columns">
+                        <b-field label="Network pick" label-position='' class="column is-one-third" >
+                            <b-select placeholder="Select a network" v-model="floatingip.floating_network_id" expanded>
+                                <option
+                                    v-for="network in networks"
+                                    :value="network.id"
+                                    :key="network.id"
+                                    >
+                                    {{ network.name }}
+                                </option>
+                            </b-select>
+                        </b-field>
+                        <div class="column" style="padding-right:30px;padding-top:45px">
+                            <button class="button is-warning" type="button" @click="createFloatingIP" >Create Floating IP</button>
+                        </div>
+                    </section>
+                    <div class="has-text-right" style="padding-right:30px;padding-top:30px">
+                        <button class="button" type="button" @click="floatingAddrToggle=false;createFloatingIP=false">Close</button>
+                    </div>
+                </div>
+            </section> -->
+
+
+
             <fab :actions="fabActions"
                 @edit="toggleEditServer=true"
                 @delete="confirmDelete()"
+                @fip="scrollMeTo('fip')"
             ></fab>
             <!-- EDIT -->
             <b-modal :active.sync="toggleEditServer"
@@ -90,7 +127,64 @@
                     aria-modal>
                 <editserver @editserverevent="editServerList" :server="servers[current]"></editserver>
             </b-modal>
+            <b-modal :active.sync="toggleActionServer"
+                    has-modal-card
+                    trap-focus
+                    aria-role="dialog"
+                    aria-modal>
+                    <div class="columns">
 
+                        <!-- UNLOCK -->
+                        <figure v-if="servers[current].locked" class="image is-128x128 column">
+                            <img @click="actionServer('unlock')" class="" src='../../assets/unlock.png'>
+                        </figure>
+
+                        <!-- LOCK -->
+                        <figure v-else class="image is-128x128 column">
+                            <img @click="actionServer('lock')" class="" src='../../assets/lock.png'>
+                        </figure>
+
+                        <!-- STOP -->
+                        <figure v-if="poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Running'" class="image is-128x128 column">
+                            <img @click="actionServer('os-stop')"  class="is-rounded" src="../../assets/stop.png">
+                        </figure>
+
+                        <!-- START -->
+                        <figure v-if="poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Shutdown'" class="image is-128x128 column">
+                            <img @click="actionServer('os-start')"  class="is-rounded" src='../../assets/start.png'>
+                        </figure>
+
+                        <!-- RESUME from suspended -->
+                        <figure v-if="poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Suspended'" class="image is-128x128 column">
+                            <img @click="actionServer('resume')" class="is-rounded" src="../../assets/start.png">
+                        </figure>
+
+                        <!-- SUSPEND -->
+                        <figure v-else class="image is-128x128 column">
+                            <img @click="actionServer('suspend')" class="is-rounded" src="../../assets/suspend.png">
+                        </figure>
+
+                        <!-- REBOOT -->
+                        <figure v-if="poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Running'" class="image is-128x128 column">
+                            <img @click="actionServer('reboot')" class="is-rounded" src="../../assets/reboot.png">
+                        </figure>
+
+                        <!-- HARD REBOOT -->
+                        <figure v-else class="image is-128x128 column">
+                            <img @click="actionServer('hard_reboot')" class="is-rounded" src="../../assets/reboot.png">
+                        </figure>
+
+                        <!-- UNPAUSE -->
+                        <figure v-if="poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Paused'" class="image is-128x128 column">
+                            <img @click="actionServer('unpause')" class="is-rounded" src="../../assets/start.png">
+                        </figure>
+
+                        <!-- PAUSE -->
+                        <figure v-else class="image is-128x128 column">
+                            <img @click="actionServer('pause')" class="is-rounded" src="../../assets/pause.png">
+                        </figure>
+                    </div>
+            </b-modal>
             
             
             <!-- DISPLAY -->
@@ -105,7 +199,7 @@
                     </div>
                 </div>
 
-                <!-- ADDRESSES INFO BUTTON -->
+                <!-- ERROR INFO BUTTON -->
                 <span v-if="this.servers[current].status=='ERROR'||this.servers[current].status=='DELETED'">
                     <div  class="columns">
                         <div class="column">
@@ -133,7 +227,6 @@
                         </div>
                     </div>
                 </span>
-                
                 
                 <!-- ADDRESSES INFO BUTTON -->
                 <div  class="columns">
@@ -310,10 +403,33 @@ export default {
         'ip',
         'user',
         'flavors',
-        'servers'
+        'servers',
+        'networks'
     ],
     data: () => ({
             // upHere:[''],
+            // floatingip:{},
+            // floatingIPs:[],
+            // floatingAddrToggle:false,
+            // floatingIP_columns:[
+            //         {
+            //             field: 'id',
+            //             label: 'ID',
+            //         },
+            //         {
+            //             field: 'floating_ip_address',
+            //             label: 'Floating IP address',
+            //         },
+            //         {
+            //             field: 'fixed_ip_address',
+            //             label: 'Fixed IP address',
+            //         },
+            //         {
+            //             field: 'description',
+            //             label: 'Description',
+            //         },
+            // ],
+            toggleActionServer:false,
             checkedRowsDelete:[],
             bulk_columns:[
                 {
@@ -357,6 +473,10 @@ export default {
                 {name: 'Suspended', class: 'has-text-warning'},
             ],
             fabActions: [
+            // {
+            //     name: 'fip',
+            //     icon: 'wifi'
+            // },
             {
                 name: 'edit',
                 icon: 'create'
@@ -368,6 +488,101 @@ export default {
         ],
     }),
     methods: {
+        // getPort(){
+        //      this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+':9696/v2.0/ports?device_id='+this.servers[this.current].id+'',
+        //         {
+        //             headers: { 
+        //                 'x-auth-token': this.user.token
+        //             }
+        //         }).then(response => {
+        //             console.log(response)
+        //         }).catch(error => {
+        //             console.log(error)
+        //             this.$toasted.error("No ports available for that server", { 
+        //                 theme: "outline", 
+        //                 position: "top-right", 
+        //                 duration : 5000
+        //                 });
+        //         });
+        // },
+        // createFloatingIP(){
+        //     this.floatingip.tenant_id = this.user.project.id;
+        //     this.floatingip.project_id = this.user.project.id;
+        //     var data = {};
+        //     data.floatingip = this.floatingip;
+        //     console.log(data)
+
+        //     this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+':9696/v2.0/floatingips',data,
+        //         {
+        //             headers: { 
+        //                 'x-auth-token': this.user.token
+        //             }
+        //         }).then(response => {
+        //             console.log(response)
+        //         }).catch(error => {
+        //             console.log(error)
+        //             this.$toasted.error("No floating IPs could be created", { 
+        //                 theme: "outline", 
+        //                 position: "top-right", 
+        //                 duration : 5000
+        //                 });
+        //         });
+            
+        // },
+        // scrollMeTo(refName) {
+        //     this.floatingAddrToggle = true;
+        //     this.getPort();
+        //     var element = this.$refs[refName];
+        //     var top = element.offsetTop;
+
+        //     window.scrollTo(0, top);
+
+        // },
+        actionServer(action){
+
+            var data = {};
+
+            if(action=='hard_reboot'){
+                data={
+                    'reboot':{
+                        'type':'HARD'
+                    }
+                }
+            } else{
+                if(action=='reboot'){
+                    data={
+                        'reboot':{
+                            'type':'SOFT'
+                        }
+                    }
+                } else{
+                    data[action] = null;
+                }
+            } 
+
+            
+
+
+            console.log("sdfsdfsdfdfdsfsd")
+            console.log(data)
+            
+            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers/'+this.servers[this.current].id+'/action',data,
+                {
+                    headers: { 
+                        'x-auth-token': this.user.token
+                    }
+                }).then(response => {
+                    this.floatingIPs = response.data.floatingips;
+                }).catch(error => {
+                    console.log(error)
+                    this.$toasted.error("No floating IPs could be reached", { 
+                        theme: "outline", 
+                        position: "top-right", 
+                        duration : 5000
+                        });
+                });
+
+        },
         confirmDelete() {
             this.$buefy.dialog.confirm({
                 title: 'Deleting Instance',
@@ -398,6 +613,24 @@ export default {
             console.log(index)
             console.log(this.upHere)
             this.upHere[index]=='0'?'1':'0';
+        },
+        getFloatingIP(){
+            //  =
+            this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+':9696/v2.0/floatingips',
+                {
+                    headers: { 
+                        'x-auth-token': this.user.token
+                    }
+                }).then(response => {
+                    this.floatingIPs = response.data.floatingips;
+                }).catch(error => {
+                    console.log(error)
+                    this.$toasted.error("No floating IPs could be reached", { 
+                        theme: "outline", 
+                        position: "top-right", 
+                        duration : 5000
+                        });
+                });
         },
     },
     computed: {
@@ -453,6 +686,7 @@ export default {
         if(this.servers){
             this.server_name_list = this.servers.map(({ name }) => name)
         }
+        this.getFloatingIP();
         this.$emit('getServersAgain');
     },
     updated(){

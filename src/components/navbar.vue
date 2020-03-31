@@ -48,18 +48,18 @@
                             </a>
                         </div>
                     </div>
-                    <div class="navbar-item has-dropdown-up is-hoverable" >
-                        <a class="navbar-link" >
-                        Storage Volumes
+                    <div class="navbar-item has-dropdown-up is-hoverable">
+                        <a class="navbar-link">
+                        Volumes
                         </a>
                         <div class="navbar-dropdown">
-                            <a class="navbar-item">
-                                <i class="far fa-minus-square"></i>&nbsp;&nbsp;&nbsp;Remove
+                            <a class="navbar-item" @click="volumeList()">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List
                             </a>
-                            <a class="navbar-item">
+                            <!-- <a class="navbar-item">
                                <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
-                            </a>
-                            <a class="navbar-item">
+                            </a> -->
+                            <a class="navbar-item"  @click="volumeCreate()">
                                 <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create
                             </a>
                         </div>
@@ -132,6 +132,12 @@ export default {
         serverCreate(){
             this.$router.push("/home/servers/create");
         },
+        volumeList(){
+            this.$router.push("/home/volumes");
+        },
+        volumeCreate(){
+            this.$router.push("/home/volumes/create");
+        },
         imageList(){
             this.$router.push("/home/images");
         },
@@ -144,6 +150,7 @@ export default {
         flavorCreate(){
             this.$router.push("/home/flavors/create");
         },
+
     },
     computed:{
         projectName() {
