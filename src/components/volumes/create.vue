@@ -117,9 +117,9 @@
             </div>
         </section>
     </span>
-    <span v-else>
-        <img class="loading" src="../../assets/loading.png">
-    </span>
+        <span v-else>
+            <img class="loading" src="../../assets/loading.png">
+        </span>
     </span>
         
 </template>

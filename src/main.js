@@ -17,6 +17,7 @@ Vue.use(VueClipboard);
 //Components
 import App from './App.vue'
 import Home from './components/home.vue'
+import CreateProject from './components/projects/create.vue'
 import Servers from './components/servers/index.vue'
 import CreateServer from './components/servers/create.vue'
 import Images from './components/images/index.vue'
@@ -24,6 +25,8 @@ import CreateImage from './components/images/create.vue'
 import Flavors from './components/flavors/index.vue'
 import Volumes from './components/volumes/index.vue'
 import CreateVolume from './components/volumes/create.vue'
+import Stacks from './components/heat/index.vue'
+import CreateStack from './components/heat/create.vue'
 // import CreateFlavor from './components/flavors/create.vue'
 
 
@@ -40,6 +43,10 @@ const routes = [
   {
     path: '/home',
     component: Home
+  },
+  {
+    path: '/home/project/create',
+    component: CreateProject
   },
   {
     path: '/home/servers',
@@ -68,6 +75,14 @@ const routes = [
   {
     path: '/home/volumes/create',
     component: CreateVolume
+  },
+  {
+    path: '/home/stacks',
+    component: Stacks
+  },
+  {
+    path: '/home/stacks/create',
+    component: CreateStack
   },
 ];
 

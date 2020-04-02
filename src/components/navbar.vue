@@ -22,7 +22,7 @@
                             {{project.name}}
                         </a>
                         <hr class="navbar-divider">
-                        <a class="navbar-item">
+                        <a class="navbar-item" @click="projectCreate()">
                             <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create new project
                         </a>
                         </div>
@@ -96,6 +96,20 @@
                             </a>
                         </div>
                     </div>
+                    <div class="navbar-item has-dropdown-up is-hoverable">
+                        <a class="navbar-link">
+                        Heat Orchestration
+                        </a>
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item" @click="stackList()">
+                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List Stacks
+                            </a>
+                            
+                            <a class="navbar-item" @click="stackCreate()">
+                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create Stack
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -118,6 +132,9 @@ export default {
     methods:{
         home(){
             this.$router.push("/home");
+        },
+        projectCreate(){
+            this.$router.push("/home/project/create");
         },
         switchProject(newproject){
             if(this.user.project!=newproject){
@@ -149,6 +166,12 @@ export default {
         },
         flavorCreate(){
             this.$router.push("/home/flavors/create");
+        },
+        stackList(){
+            this.$router.push("/home/stacks");
+        },
+        stackCreate(){
+            this.$router.push("/home/stacks/create");
         },
 
     },

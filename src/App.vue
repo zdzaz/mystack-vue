@@ -41,7 +41,7 @@
     </div>
     <div v-else>
       <span v-if="!loadingVolumes&&!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
-        <router-view :key="servers.length" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
+        <router-view :key="servers.length" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
         <mynavbar :ip="ip" :user="user" :projects="projects" :servers="servers" @switchproject="switchProject"></mynavbar>
       </span>
       <span v-else>
@@ -133,15 +133,13 @@ export default {
         this.loading = false;
         }).catch(err => {
           console.log(err);
-          var error_message = "Somethign went wrong...";
           if(err == "Error: Request failed with status code 401"){
-            error_message = "Invalid credentials..."
+            this.$toasted.error("Authorization required - 401!", { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                });
           }
-          this.$toasted.error(error_message, { 
-            theme: "outline", 
-            position: "top-right", 
-            duration : 5000
-          });
           this.loading = false;
         });
     },
@@ -377,18 +375,18 @@ export default {
                 'x-auth-token': this.user.token
             }
         }).then((response) => {
-            this.$toasted.success("Deleted instance with success", { 
-                theme: "outline", 
-                position: "top-right", 
-                duration : 5000
-                });
             console.log(response)
             this.servers = this.servers.filter(s => s.id !== id);
             this.loadingDeleteServer = false;
+            this.$toasted.success("Instance deleted with success", { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                });
             this.$forceUpdate();
         }).catch(error => {
             console.log(error)
-            this.$toasted.error("Could not delete server", { 
+            this.$toasted.error("Could not delete instance", { 
                 theme: "outline", 
                 position: "top-right", 
                 duration : 5000
@@ -459,7 +457,7 @@ export default {
             this.loadingVolumes = false;
         }).catch(error => {
             console.log(error)
-            this.$toasted.error("No volumes could be reached!", { 
+            this.$toasted.error("No volumes could be reached", { 
                 theme: "outline", 
                 position: "top-right", 
                 duration : 5000
@@ -478,11 +476,6 @@ export default {
             this.volumes = response.data.volumes;
         }).catch(error => {
             console.log(error)
-            this.$toasted.error("No volumes could be reached!", { 
-                theme: "outline", 
-                position: "top-right", 
-                duration : 5000
-                });
         });
 
     },

@@ -1,0 +1,20 @@
+heat_template_version: 2015-04-30
+
+description: Template to create 2 VMs
+
+resources: 
+  my_instance1: 
+    type: OS::Nova::Server 
+    properties: 
+      image: cirros-0.4.0-x86_64-disk
+      flavor: m1.small 
+      networks:
+        - network : f032da6a-6b8e-4d3b-afa6-a937fc6c3ce2
+        
+  my_instance2: 
+    type: OS::Nova::Server 
+    properties: 
+      image: cirros-0.4.0-x86_64-disk
+      flavor: m1.small 
+      networks:
+        - network : f032da6a-6b8e-4d3b-afa6-a937fc6c3ce2

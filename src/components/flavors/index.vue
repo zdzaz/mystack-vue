@@ -12,11 +12,11 @@
         <section>
             <div class="container" style="padding-top:30px;">
                 <section class="columns">
-                    <b-field label="Filter by name" label-position='on-border' class="column">
-                        <b-input v-model="search_name"/>
-                    </b-field>
                     <b-field label="Filter by ID" label-position='on-border' class="column">
                         <b-input v-model="search_id"/>
+                    </b-field>
+                    <b-field label="Filter by name" label-position='on-border' class="column">
+                        <b-input v-model="search_name"/>
                     </b-field>
                     <!-- PER PAGE -->
                     <b-field label="Per Page" label-position='on-border' class="column">
