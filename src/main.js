@@ -27,6 +27,7 @@ import Volumes from './components/volumes/index.vue'
 import CreateVolume from './components/volumes/create.vue'
 import Stacks from './components/heat/index.vue'
 import CreateStack from './components/heat/create.vue'
+import StackDetail from './components/heat/detail.vue'
 // import CreateFlavor from './components/flavors/create.vue'
 
 
@@ -79,6 +80,10 @@ const routes = [
   {
     path: '/home/stacks',
     component: Stacks
+  },
+  {
+    path: '/home/stacks/:name/:id',
+    component: StackDetail
   },
   {
     path: '/home/stacks/create',

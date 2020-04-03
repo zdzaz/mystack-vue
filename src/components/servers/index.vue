@@ -53,7 +53,7 @@
                                         <b disabled :class="server.list.status=='ACTIVE'?'has-text-success':'has-text-danger'" class="is-size-6">{{ server.list.status }} </b>&
                                         <b :class="poweredStates[server.list['OS-EXT-STS:power_state']].class"> {{poweredStates[server.list['OS-EXT-STS:power_state']].name}}</b>
                                         <p class="has-text-info">Zone: {{servers[current]['OS-EXT-AZ:availability_zone']}}</p>
-                                        <button @click="go('/home/flavors')" class="is-primary button is-small">Flavor {{ server.list.flavor.id}}</button>
+                                        <button @click="go('/home/flavors')" class="is-primary button is-small">Flavor {{ server.list.flavor.id.length>5?server.list.flavor.id.substring(0,5)+'...':server.list.flavor.id}}</button>
                                         <button @click="go(server.list.image==''?'/home/volumes':'/home/images')" class="button is-small is-dark">{{ server.list.image==""?'Booted from drive':"Booted Image"}}</button>
                                     </div>
                                 </div>

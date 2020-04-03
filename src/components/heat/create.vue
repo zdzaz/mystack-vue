@@ -43,7 +43,7 @@
                                     <b-field label="Stack Name" label-position='' class="column">
                                         <b-input v-model="newStack.stack_name" placeholder="my-new-stack" required></b-input>
                                     </b-field>
-                                    <b-field label="Stack Name" label-position='' class="column">
+                                    <b-field label="HOT Version" label-position='' class="column">
                                         <b-input  v-model="newStack.heat_template_version" placeholder="2013-05-23" disabled></b-input>
                                     </b-field>
                                     <b-field label="Parameter flavor pick" label-position='' class="column is-one-third" >
@@ -57,7 +57,7 @@
                                             </option>
                                         </b-select>
                                     </b-field>
-                                    
+                                    <i class="fas fa-question is-dark" @click="alert"></i>
                                 </div>
                                 <b-field type="is-success" class=" ">
                                         <b-radio-button  type="is-success" v-model="newStack.disable_rollback"
@@ -315,6 +315,9 @@ export default {
                     position: "top-right", 
                     duration : 5000
                 });
+        },
+        alert() {
+            this.$buefy.dialog.alert('Double click a table entry to check details')
         },
         
     },

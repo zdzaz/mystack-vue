@@ -656,8 +656,8 @@ export default {
                 if(this.createNewVolume=='yes'){
 
                     var dataVolume = {
-                        "project": {
-                            "size":this.newServer.volumeSize
+                        "volume": {
+                            "size":this.newVolume.size
                         }
                     }
 
@@ -668,7 +668,16 @@ export default {
                         }
 
                     }).then(response => {
-                        console.log(response)
+
+                        // especificar volume block_device_mapping_v2 , exemplo
+                        this.data.server.block_device_mapping_v2 = [{
+                            "boot_index": "0",
+                            "uuid": response.data.volume.id,
+                            "source_type": "volume",
+                            "volume_size": response.data.volume.size,
+                            "destination_type": "volume",
+                            "delete_on_termination": false,
+                        }]
 
                         this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/compute/v2.1/servers',this.data,
                         {
@@ -676,21 +685,14 @@ export default {
                                 'x-auth-token': this.user.token
                             }
                         }).then(response => {
-                                console.log(response);
-
-                                // especificar volume block_device_mapping_v2 , exemplo
-                                // "block_device_mapping_v2": [{
-                                //     "boot_index": "0",
-                                //     "uuid": "ac408821-c95a-448f-9292-73986c790911",
-                                //     "source_type": "image",
-                                //     "volume_size": "25",
-                                //     "destination_type": "volume",
-                                //     "delete_on_termination": true,
-                                //     "tag": "disk1",
-                                //     "disk_bus": "scsi"}]
-
+                               console.log(response);
                                 this.$router.push("/home/servers");
                                 this.loading = false
+                                this.$toasted.success("Server & Volume Created", { 
+                                theme: "outline", 
+                                position: "top-right", 
+                                duration : 5000
+                            });
                         }).catch(response => {
                             console.log(response);
                             var error_message = "Somethign went wrong...";
@@ -701,8 +703,6 @@ export default {
                             });
                             this.loading = false
                         });
-
-
                     }).catch(error => {
                         console.log(error)
                         this.$toasted.error("Could not create volume", { 

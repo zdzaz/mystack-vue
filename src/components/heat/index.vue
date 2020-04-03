@@ -30,7 +30,7 @@
                 <section>
                     <b-table
                         :selected.sync="selected"
-                        @dblclick="goTo(selected.id)"
+                        @dblclick="goTo(selected.id,selected.stack_name)"
                         focusable
                         paginated
                         :per-page="perPage"
@@ -104,7 +104,6 @@
 export default {
     name: 'index',
     props:[
-        'images',
         'ip',
         'user'
     ],
@@ -157,8 +156,8 @@ export default {
         selectedToNull(){
             this.selected=null;
         },
-        goTo(stack_id){
-            this.$router.push("/home/stacks/"+stack_id);
+        goTo(stack_id,stack_name){
+            this.$router.push("/home/stacks"+stack_name+"/"+stack_id);
         },
         getStacks(){
             this.loading = true;

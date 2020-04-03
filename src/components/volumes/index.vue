@@ -28,6 +28,8 @@
                                 <option value="20">20 per page</option>
                             </b-select>
                         </b-field>
+                            <i class="fas fa-question is-dark" @click="alert"></i>
+
                     </section>
                     <section>
                         <b-table
@@ -177,7 +179,10 @@ export default {
                 });
                     this.loading = false;
             });
-        }
+        },
+        alert() {
+            this.$buefy.dialog.alert('Double click a table entry to edit volume')
+        },
     },
     computed: {
         allocatedDifference(){
