@@ -83,37 +83,6 @@
 
             <section v-if="current>=0">
 
-                <!-- <span ref="fip">
-                </span>
-                <section  v-if="floatingAddrToggle">
-                    <div class="container" style="padding-bottom:40px;padding-left:30px;padding-top:30px">
-                        <div class="columns">
-                            <div class="column">
-                                <b class="is-size-3	">Assign Floating IP address</b> 
-                            </div>
-                        </div>
-                        <section class="columns">
-                            <b-field label="Network pick" label-position='' class="column is-one-third" >
-                                <b-select placeholder="Select a network" v-model="floatingip.floating_network_id" expanded>
-                                    <option
-                                        v-for="network in networks"
-                                        :value="network.id"
-                                        :key="network.id"
-                                        >
-                                        {{ network.name }}
-                                    </option>
-                                </b-select>
-                            </b-field>
-                            <div class="column" style="padding-right:30px;padding-top:45px">
-                                <button class="button is-warning" type="button" @click="createFloatingIP" >Create Floating IP</button>
-                            </div>
-                        </section>
-                        <div class="has-text-right" style="padding-right:30px;padding-top:30px">
-                            <button class="button" type="button" @click="floatingAddrToggle=false;createFloatingIP=false">Close</button>
-                        </div>
-                    </div>
-                </section> -->
-
                 <fab :actions="fabActions"
                     @edit="toggleEditServer=true"
                     @delete="confirmDelete()"
@@ -151,8 +120,8 @@
                             </figure>
 
                             <!-- START -->
-                            <figure v-on:mouseover="mouseover('Start')" v-on:mouseleave="mouseover('')" v-if="!servers[current].status=='SUSPENDED'&&poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Shutdown'" class="image is-128x128 column">
-                                <a><img @click="actionServer('os-start')"  class="is-rounded" src='../../assets/start.png'></a>
+                            <figure v-on:mouseover="mouseover('Start')" v-on:mouseleave="mouseover('')" v-if="servers[current].status!='SUSPENDED'&&poweredStates[servers[current]['OS-EXT-STS:power_state']].name=='Shutdown'" class="image is-128x128 column">
+                                <a><img @click="actionServer('os-start')"  class="is-rounded" src='../../assets/start.png'></a> 
                             </figure>
 
                             <!-- RESUME from suspended -->
@@ -190,7 +159,7 @@
                             <div v-if="messageAction!=''" class=" column is-one-third">
                             </div>
                             <b-button v-if="messageAction!=''" type="is-primary" size="is-medium" expanded>
-                                <b>{{messageAction}}</b>
+                                <b>{{messageAction}} </b>
                             </b-button>
                             <div v-if="messageAction!=''" class=" column is-one-third">
                             </div>

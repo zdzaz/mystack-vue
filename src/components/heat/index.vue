@@ -157,7 +157,7 @@ export default {
             this.selected=null;
         },
         goTo(stack_id,stack_name){
-            this.$router.push("/home/stacks"+stack_name+"/"+stack_id);
+            this.$router.push("/home/stacks/"+stack_name+"/"+stack_id);
         },
         getStacks(){
             this.loading = true;

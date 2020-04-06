@@ -10,7 +10,43 @@
             </div>
         </section>
         <section>
-            
+           <div style="margin-top:30px" class="container">
+               <b-collapse
+                class="card highlight0"
+                animation="slide"
+                :open="isOpen == index"
+                @open="isOpen = index">
+                <div
+                    slot="trigger"
+                    slot-scope="props"
+                    class="card-header"
+                    role="button">
+                    <p class="card-header-title highlight6">
+                        Resources
+                    </p>
+                    <a class="card-header-icon">
+                        <b-icon
+                            :icon="props.open ? 'menu-down' : 'menu-up'">
+                        </b-icon>
+                    </a>
+                </div>
+                <div class="card-content">
+                    <div class="content columns">
+                        <div v-for="resource in resources" :key="resource.resource_name" class="column is-one-fifth">
+                            <div class="columns">
+                                <img height="100" width="100" v-if="resource.resource_type=='OS::Nova::Server'" src="../../assets/OSNovaServer.png">
+                                <img height="100" width="100" v-if="resource.resource_type=='OS::Cinder::Volume'" src="../../assets/OSCinderVolume.png">
+                                <img height="100" width="100" v-else-if="resource.resource_type!='OS::Nova::Server'" src="../../assets/else.png">
+                            </div>
+                            <p>{{resource.resource_name}}</p>
+                            <p>{{resource.resource_type}}</p>
+                            <p>{{resource.creation_time}}</p>
+                            <p>{{resource.resource_status}}</p>
+                        </div>
+                    </div>
+                </div>
+            </b-collapse>
+           </div>
         </section>                
     </span>
         
@@ -24,67 +60,27 @@ export default {
         'user'
     ],
     data: () => ({
-        selected:null,
-        stacks:[],
-        perPage:10,
-        currentPage:1,
-        columns: [
-            {
-                field: 'stack_name',
-                label: 'Name',
-
-            },
-            {
-                field: 'description',
-                label: 'Description',
-
-            },
-            {
-                field: 'stack_status',
-                label: 'Status',
-
-            },
-            {
-                field: 'stack_status_reason',
-                label: 'Status Reason',
-
-            },
-            {
-                field: 'creation_time',
-                label: 'Created',
-
-            },
-            {
-                field: 'updated_time',
-                label: 'Updated',
-
-            },
-            {
-                field: 'deletion_time',
-                label: 'Deleted',
-
-            },
-        ],
-        search_name:'',
-      
+        resources:[],
+        isOpen: 0,
+        index:0,
+          
     }),
     methods: {
         selectedToNull(){
             this.selected=null;
         },
-        goTo(stack_id){
-            this.$router.push("/home/stacks/"+stack_id);
-        },
         getResources(){
             this.loading = true;
-            this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/heat-api/v1/'+this.user.project.id+'/stacks/'+this.$router.params.name+'/'+this.$router.params.id+'/resources',
+            this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/heat-api/v1/'+this.user.project.id+'/stacks/'+this.$route.params.name+'/'+this.$route.params.id+'/resources',
                 {
                     headers: { 
                         'x-auth-token': this.user.token
                     }
                 }).then(response => {
-                    this.stacks = response.data.stacks;
+                    this.resources = response.data.resources;
                     this.loading = false;
+                    console.log(this.resources)
+
                 }).catch(error => {
                     console.log(error)
                     this.$toasted.error("No stacks could be reached", { 
@@ -100,7 +96,7 @@ export default {
         
     },
     mounted(){
-        // this.getResources();
+        this.getResources();
     }
 }
 </script>
@@ -108,5 +104,5 @@ export default {
 <style>
     .highlight0 {
         background:#bbb8ba48;
-    }
+    }   
 </style>

@@ -14,7 +14,6 @@
                 </div>
             </div>
         </section>
-        {{json}}
         <section>
             <div class="container" style="padding-top:30px">
                 <!-- GERAL -->
@@ -113,7 +112,7 @@
                                         </b-select>
                                     </b-field>
                                     <b-field label="Protected" label-position='' class="column is-one-quarter">
-                                        <b-select placeholder="Select protection state" v-model="newImage.selectedProtection" expanded>
+                                        <b-select disabled placeholder="Select protection state" v-model="newImage.selectedProtection" expanded>
                                             <option
                                                 value="true"
                                                 >
@@ -206,25 +205,46 @@ export default {
             var data = { "image":{
                     'name':this.newImage.name,
                     'disk_format':this.newImage.selectedDiskFormat,
+                    'container_format':'bare',
                     'min_ram':this.newImage.min_ram==''?0:Number(this.newImage.min_ram),
                     'min_disk':this.newImage.min_disk==''?0:Number(this.newImage.min_disk),
                     'visibility':this.newImage.selectedVisibility,
-                    'protection':this.newImage.selectedProtection=='true'?true:false,
                     'description': this.newImage.description
                 }
             }
 
+
             console.log(data)
-            this.json = data;
-            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images',data,
+            this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images',data.image,
             {
                 headers: { 
                     'x-auth-token': this.user.token,
-                    'location':this.file
                 }
             }).then(response => {
-                    console.log(response);
-                    this.$router.push("/home/images");
+                    console.log(response.data.id);
+
+                    var file = this.newImage.selectedFile;
+
+                    this.axios.put('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images/'+response.data.id+'/file',file,
+                    {
+                        headers: { 
+                            'x-auth-token': this.user.token,
+                            'Content-Type': 'application/octet-stream',
+                        }
+                    }).then(response => {
+                            console.log(response);
+                            this.$emit('getImagesAgain');
+                            this.$router.push("/home/images");
+
+                    }).catch(response => {
+                        console.log(response);
+                        var error_message = "Somethign went wrong...";
+                        if(response == "Error: Request failed with status code 401"){
+                            error_message = "Invalid credentials..."
+                        }
+                        this.error(error_message);
+                        this.loading = false;
+                    });
 
             }).catch(response => {
                 console.log(response);

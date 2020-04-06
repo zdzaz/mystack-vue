@@ -40,8 +40,7 @@
           </div>
       
           <div class="columns">
-            <div class="column">
-            </div>
+            
             <div class="column">
               <apexchart width="300" :options="chartOptionsNetworkFixed" :series="seriesNetworkFixed"></apexchart>
             </div>
@@ -52,6 +51,10 @@
             </div>
             <div class="column">
             </div>
+            <div class="column">
+              <apexchart width="300" :options="chartOptionsVolumes" :series="seriesVolumes"></apexchart>
+            </div>
+
           </div>
       </section>
     </div>
@@ -294,6 +297,45 @@ export default {
       },
       labels: ['Floating IPs'],
     },
+
+    seriesVolumes:[],
+    chartOptionsVolumes: {
+      colors:["#f90010"],
+      chart: {
+        height: 350,
+        type: 'radialBar',
+      },
+      plotOptions: {
+        radialBar: {
+          hollow: {
+            size: '70%',
+            background: "#ffffff"
+          }
+        },
+        track: {
+          dropShadow: {
+            enabled: true,
+            top: 2,
+            left: 0,
+            blur: 4,
+            opacity: 0.15
+          }
+        },
+      },
+      fill: {
+        type: "gradient",
+        gradient: {
+          shade: "dark",
+          type: "vertical",
+          gradientToColors: ["#87D4F9"],
+          stops: [0, 100]
+        }
+      },
+      stroke: {
+        lineCap: "round"
+      },
+      labels: ['Volumes'],
+    },
     
 
   }),
@@ -307,7 +349,29 @@ export default {
           }
         }).then(response => {
             this.quota_set = response.data.quota_set;
-            console.log(this.quota_set)
+            this.buildLimits();
+            this.loading = false;
+        }).catch(error => {
+            console.log(error)
+            this.$toasted.error("No limits could be reached", { 
+                theme: "outline", 
+                position: "top-right", 
+                duration : 5000
+                });
+                this.loading = false;
+        });
+    },
+    getQuotasVolume(){
+      this.loading = true;
+      this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/volume/v3/'+this.user.project.id+'/limits',
+        {
+          headers: { 
+              'x-auth-token': this.user.token
+          }
+        }).then((response) => {
+            console.log(response)
+            this.seriesVolumes.push(response.data.limits.absolute.totalVolumesUsed * 100 / response.data.limits.absolute.maxTotalVolumes)
+
             this.buildLimits();
             this.loading = false;
         }).catch(error => {
@@ -339,11 +403,9 @@ export default {
           }
         }).then(response => {
             this.project_usage = response.data.tenant_usage;
-            console.log(this.project_usage)
             this.buildProjectUsage();
             this.loading = false;
-        }).catch(error => {
-            console.log(error)
+        }).catch(() => {
             this.$toasted.error("No project usage could be retrieved", { 
                 theme: "outline", 
                 position: "top-right", 
@@ -355,7 +417,6 @@ export default {
     // BAR
     buildProjectUsage(){
       this.project_usage.server_usages.forEach(server => {
-        console.log(this.chartOptions.xaxis.categories)
         this.chartOptions.xaxis.categories.push(server.name)
         // Horas Up
         this.series[0].data.push(server.uptime/3600)
@@ -374,6 +435,7 @@ export default {
   
   mounted(){
     this.getQuotas();
+    this.getQuotasVolume();
     this.getPerformanceInstances();
   },
 }

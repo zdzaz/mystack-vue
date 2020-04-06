@@ -19,6 +19,7 @@ import App from './App.vue'
 import Home from './components/home.vue'
 import CreateProject from './components/projects/create.vue'
 import Servers from './components/servers/index.vue'
+import ServerConnection from './components/servers/connection.vue'
 import CreateServer from './components/servers/create.vue'
 import Images from './components/images/index.vue'
 import CreateImage from './components/images/create.vue'
@@ -56,6 +57,10 @@ const routes = [
   {
     path: '/home/servers/create',
     component: CreateServer
+  },
+  {
+    path: '/home/servers/connection',
+    component: ServerConnection
   },
   {
     path: '/home/images',

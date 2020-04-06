@@ -41,7 +41,7 @@
     </div>
     <div v-else>
       <span v-if="!loadingVolumes&&!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
-        <router-view :key="servers.length" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
+        <router-view :key="servers.length" @getImagesAgain="getImages" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
         <mynavbar :ip="ip" :user="user" :projects="projects" :servers="servers" @switchproject="switchProject"></mynavbar>
       </span>
       <span v-else>

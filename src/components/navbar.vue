@@ -23,7 +23,7 @@
                         </a>
                         <hr class="navbar-divider">
                         <a class="navbar-item" @click="projectCreate()">
-                            <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create new project
+                            <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create new project
                         </a>
                         </div>
                     </div>
@@ -38,13 +38,16 @@
                         </a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" @click="serverList()">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List
                             </a>
                             <!-- <a class="navbar-item">
                                <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
                             </a> -->
                             <a class="navbar-item"  @click="serverCreate()">
-                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
+                            </a>
+                            <a class="navbar-item"  @click="serverConnection()">
+                                <i class=""><span class="material-icons">settings_ethernet</span></i>&nbsp;&nbsp;&nbsp;Connection
                             </a>
                         </div>
                     </div>
@@ -54,13 +57,13 @@
                         </a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" @click="volumeList()">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List
                             </a>
                             <!-- <a class="navbar-item">
                                <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
                             </a> -->
                             <a class="navbar-item"  @click="volumeCreate()">
-                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
                             </a>
                         </div>
                     </div>
@@ -70,13 +73,13 @@
                         </a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" @click="imageList()">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List
                             </a>
                             <!-- <a class="navbar-item">
                                <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
                             </a> -->
                             <a class="navbar-item"  @click="imageCreate()">
-                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
                             </a>
                         </div>
                     </div>
@@ -86,13 +89,13 @@
                         </a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" @click="flavorList()">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List
                             </a>
                             <!-- <a class="navbar-item">
                                <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
                             </a> -->
                             <a class="navbar-item" style="opacity:50%">
-                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
                             </a>
                         </div>
                     </div>
@@ -102,11 +105,11 @@
                         </a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" @click="stackList()">
-                                <i class="fa fa-eye"></i>&nbsp;&nbsp;&nbsp;List Stacks
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List Stacks
                             </a>
                             
                             <a class="navbar-item" @click="stackCreate()">
-                                <i class="far fa-plus-square"></i>&nbsp;&nbsp;&nbsp;Create Stack
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create Stack
                             </a>
                         </div>
                     </div>
@@ -148,6 +151,9 @@ export default {
         },
         serverCreate(){
             this.$router.push("/home/servers/create");
+        },
+        serverConnection(){
+            this.$router.push("/home/servers/connection");
         },
         volumeList(){
             this.$router.push("/home/volumes");

@@ -212,7 +212,7 @@
                             <!-- NET FROM LIST -->
                             <div v-if="chooseNetwork=='list'" class="content columns">
                                 <b-field label="Network pick(s)" label-position='' class="column is-one-third" >
-                                    <b-select multiple placeholder="Select a flavor" v-model="selectedNetworks" expanded>
+                                    <b-select multiple placeholder="Select a network" v-model="selectedNetworks" expanded>
                                         <option
                                             v-for="network in networks"
                                             :value="network"
