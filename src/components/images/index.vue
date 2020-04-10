@@ -45,12 +45,18 @@
                             <option value="20">20 per page</option>
                         </b-select>
                     </b-field>
+                    <b-field label="" class="column" style="align-content:right">
+                        <button :disabled="checkedRows.length<=0" class="button is-danger"  @click.prevent.stop="bulkDelete()">Delete</button>
+                    </b-field>
                 </section>
                 <section>
                     <b-table
                         :selected.sync="selected"
                         focusable
                         paginated
+                        checkable
+                        checkbox-position="right"
+                        :checked-rows.sync="checkedRows"
                         :per-page="perPage"
                         :current-page.sync="currentPage"
                         :data="filteredImages"
@@ -132,6 +138,7 @@ export default {
         currentPage:1,
         showHash:false,
         showOwner:false,
+        checkedRows:[],
         columns: [
             {
                 field: 'id',
@@ -181,6 +188,34 @@ export default {
     methods: {
         selectedToNull(){
             this.selected=null;
+        },
+        bulkDelete(){
+            this.loading = true;
+            this.checkedRows.forEach(img=>{
+            this.axios.delete('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/image/v2/images/'+img.id+'',
+                {
+                headers: { 
+                    'x-auth-token': this.user.token
+                }
+                }).then(() => {
+                this.$emit("getImagesAgain");
+                this.loading = false;
+                this.$toasted.success("Image deleted with success", { 
+                        theme: "outline", 
+                        position: "top-right", 
+                        duration : 5000
+                    });
+                }).catch(error => {
+                console.log(error)
+                this.$toasted.error("Could not delete Image", { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                    });
+                    this.loading = false;
+                });
+                this.$forceUpdate();
+            });
         }
     },
     computed: {

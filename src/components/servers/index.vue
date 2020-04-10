@@ -38,18 +38,18 @@
                         </b-field>
                     </b-field>
                     
-                    <b-carousel-list repeat v-model="current" :data="filteredServers" :has-drag="false" :items-to-show="5" style="padding-bottom:30px">
+                    <b-carousel-list  icon-size="is-large"  repeat v-model="current" :data="filteredServers" :items-to-show="5" style="padding-bottom:30px">
                         <template slot="item" slot-scope="server">
                             <div :class="server.index==current?'up':'down'" class="card" @dblclick="toggleActionServer=true"  @click="server.index==current?'':info(server.index,server)">
                                 <div class="card-image">
                                     <figure class="image is-5by4">
-                                        <img src="../../assets/vm.png">
+                                        <img src="../../assets/OSNovaServer.png">
                                     </figure>
                                     <b-tag v-if="server.list.tag" type="is-danger" rounded style="position: absolute; top: 0;"><b><p class="title is-6">{{ server.list.tag[0] }}</p></b></b-tag>
                                 </div>
-                                <div class="card-content">
+                                <div class="card-content" >
                                     <div class="content">
-                                        <p class="has-text-centered title is-size-4">{{ server.list.name }}</p>
+                                        <p class="has-text-centered title is-size-5">{{ server.list.name }}</p>
                                         <b disabled :class="server.list.status=='ACTIVE'?'has-text-success':'has-text-danger'" class="is-size-6">{{ server.list.status }} </b>&
                                         <b :class="poweredStates[server.list['OS-EXT-STS:power_state']].class"> {{poweredStates[server.list['OS-EXT-STS:power_state']].name}}</b>
                                         <p class="has-text-info">Zone: {{servers[current]['OS-EXT-AZ:availability_zone']}}</p>
@@ -70,19 +70,16 @@
                         </div>
                     </div>
                     <section>
-                            <b-table checkable :checked-rows.sync="checkedRowsDelete" :data="servers" :columns="bulk_columns"></b-table>
+                            <b-table checkable :checked-rows.sync="checkedRowsDelete" checkbox-position="right" :data="servers" :columns="bulk_columns"></b-table>
                     </section>
                     <div class="has-text-right" style="padding-right:30px;padding-top:30px">
                         <button class="button" type="button" @click="bulk_delete=false">Close</button>
-                        <button  class="button is-danger"  @click.prevent.stop="bulkDelete()">Bulk Delete</button>
+                        <button :disabled="checkedRowsDelete.length<=0"  class="button is-danger"  @click.prevent.stop="bulkDelete()">Bulk Delete</button>
                     </div>
                 </div>
             </section>
-            
-            
 
             <section v-if="current>=0">
-
                 <fab :actions="fabActions"
                     @edit="toggleEditServer=true"
                     @delete="confirmDelete()"
@@ -391,28 +388,6 @@ export default {
         'networks'
     ],
     data: () => ({
-            // upHere:[''],
-            // floatingip:{},
-            // floatingIPs:[],
-            // floatingAddrToggle:false,
-            // floatingIP_columns:[
-            //         {
-            //             field: 'id',
-            //             label: 'ID',
-            //         },
-            //         {
-            //             field: 'floating_ip_address',
-            //             label: 'Floating IP address',
-            //         },
-            //         {
-            //             field: 'fixed_ip_address',
-            //             label: 'Fixed IP address',
-            //         },
-            //         {
-            //             field: 'description',
-            //             label: 'Description',
-            //         },
-            // ],
             messageAction:'',
             loading:false,
             toggleActionServer:false,

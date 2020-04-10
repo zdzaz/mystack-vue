@@ -277,8 +277,6 @@ export default {
                         'x-auth-token': this.user.token
                     }
                 }).then(response => {
-                    console.log(response)
-                    console.log("created floating IP, will associated with server")
 
                     if(!this.justCreateFIP){
                         if( !this.selectedServerPort || this.selectedServerPort.id==null){
@@ -297,9 +295,13 @@ export default {
                             headers: { 
                                 'x-auth-token': this.user.token
                             }
-                        }).then(response => {
-                            console.log("updated fip")
-                            console.log(response)
+                        }).then(() => {
+                            this.$router.push('/home/servers');
+                            this.$toasted.success("Floating IP created and server configured!", { 
+                                theme: "outline", 
+                                position: "top-right", 
+                                duration : 5000
+                            });
                             this.loading = false;
                         }).catch(error => {
                             console.log(error)
@@ -311,7 +313,11 @@ export default {
                                 this.loading = false;
                         });
                     }
-
+                    this.$toasted.success("Floating IP created!", { 
+                        theme: "outline", 
+                        position: "top-right", 
+                        duration : 5000
+                    });
                     
                 }).catch(error => {
                     console.log(error)
@@ -342,9 +348,13 @@ export default {
                         headers: { 
                             'x-auth-token': this.user.token
                         }
-                    }).then(response => {
-                        console.log("updated fip")
-                        console.log(response)
+                    }).then(() => {
+                        this.$router.push('/home/servers');
+                        this.$toasted.success("IP configured!", { 
+                            theme: "outline", 
+                            position: "top-right", 
+                            duration : 5000
+                        });
                         this.loading = false;
                     }).catch(error => {
                         console.log(error)

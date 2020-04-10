@@ -26,12 +26,18 @@
                             <option value="20">20 per page</option>
                         </b-select>
                     </b-field>
+                    <b-field label="" class="column" style="align-content:right">
+                        <button :disabled="checkedRows.length<=0" class="button is-danger"  @click.prevent.stop="bulkDelete()">Delete</button>
+                    </b-field>
                 </section>
                 <section>
                     <b-table
                         :selected.sync="selected"
                         @dblclick="goTo(selected.id,selected.stack_name)"
                         focusable
+                        checkable
+                        checkbox-position="right"
+                        :checked-rows.sync="checkedRows"
                         paginated
                         :per-page="perPage"
                         :current-page.sync="currentPage"
@@ -41,61 +47,6 @@
                 </section>
              </div>
         </section>
-        <!-- <section v-if="selected">
-            <div class="container highlight0" style="padding-top:30px; padding-left:30px; padding-bottom:30px">
-                <b> {{selected.name}} </b>
-                <div class="columns">
-                    <b-field style="padding-top:30px" label="Hardware Model" label-position='' class="column">
-                        {{selected.hw_rng_model}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="Disk Format" label-position='' class="column">
-                        {{selected.disk_format}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="Container Format" label-position='' class="column">
-                        {{selected.container_format}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="Minimum Disk" label-position='' class="column">
-                        {{selected.min_disk}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="Minimum RAM" label-position='' class="column">
-                        {{selected.min_ram}}
-                    </b-field>
-                </div>
-                <div class="columns">
-                    <b-field style="padding-top:30px" label="Visibility" label-position='' class="column">
-                        {{selected.visibility}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="Protected?" label-position='' class="column">
-                        {{selected.protected==false?'No':'Yes'}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="OS Hidden?" label-position='' class="column">
-                        {{selected.os_hidden==false?'No':'Yes'}}
-                    </b-field>
-                    <b-field style="padding-top:30px" label="OS Hash Algorithm" label-position='' class="column">
-                        {{selected.os_hash_algo}}
-                    </b-field> 
-                    <b-field style="padding-top:30px" label="Checksum" label-position='' class="column">
-                        {{selected.checksum}}
-                    </b-field>
-                         
-                </div>
-                <div style="padding-top:30px">
-                    <button class="button block" @click="showHash = !showHash">Toggle OS Hash Value</button>
-                    <b-field v-show="showHash" >
-                        {{selected.os_hash_value}}
-                    </b-field>
-                    
-                </div>
-                <div style="padding-top:30px">
-                    <button class="button block" @click="showOwner = !showOwner">Toggle Owner ID</button>
-                    <b-field v-show="showOwner" >
-                        {{selected.owner}}
-                    </b-field>
-                    
-                </div>
-             </div>
-        </section> -->
-        
     </span>
         
 </template>
@@ -110,6 +61,7 @@ export default {
     data: () => ({
         selected:null,
         stacks:[],
+        checkedRows:[],
         perPage:10,
         currentPage:1,
         columns: [
@@ -143,16 +95,46 @@ export default {
                 label: 'Updated',
 
             },
-            {
-                field: 'deletion_time',
-                label: 'Deleted',
+            // {
+            //     field: 'deletion_time',
+            //     label: 'Deleted',
 
-            },
+            // },
         ],
         search_name:'',
       
     }),
     methods: {
+        bulkDelete(){
+            this.loading = true;
+            this.checkedRows.forEach(stack=>{
+            this.axios.delete('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/heat-api/v1/'+this.user.project.id+'/stacks/'+stack.stack_name+'/'+stack.id+'',
+                {
+                headers: { 
+                    'x-auth-token': this.user.token
+                }
+                }).then((response) => {
+                console.log(response)
+                this.stacks = this.stacks.filter(s => s.id !== stack.id);
+                this.loading = false;
+                this.$toasted.success("Stack deleted with success", { 
+                        theme: "outline", 
+                        position: "top-right", 
+                        duration : 5000
+                    });
+                this.$forceUpdate();
+                }).catch(error => {
+                console.log(error)
+                this.$toasted.error("Could not delete Stack", { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                    });
+                    this.loading = false;
+                });
+                this.$forceUpdate();
+            });
+        },
         selectedToNull(){
             this.selected=null;
         },
@@ -179,6 +161,14 @@ export default {
                         this.loading = false;
                 });
             },
+    
+    
+    
+    
+    
+    
+    
+    
     },
     computed: {
         filteredStacks() {

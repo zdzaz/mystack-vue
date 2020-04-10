@@ -13,6 +13,8 @@
             <section>
                 <div class="container" style="padding-top:30px;">
                     <section class="columns">
+                        <b-field label="" class="column" style="align-content:right">
+                        </b-field>
                         <b-field  label="Filter by name" label-position='on-border' class="column">
                             <b-input type="number" v-model="search_size"/>
                         </b-field>
@@ -28,13 +30,20 @@
                                 <option value="20">20 per page</option>
                             </b-select>
                         </b-field>
-                            <i class="fas fa-question is-dark" @click="alert"></i>
-
+                        <b-field label="" class="column" style="align-content:right">
+                        </b-field>
+                        <b-field label="" class="column" style="align-content:right">
+                            <button :disabled="checkedRowsDelete.length<=0" class="button is-danger"  @click.prevent.stop="bulkDelete()">Delete</button>
+                        </b-field>
+                        <i class="fas fa-question is-dark" @click="alert"></i>
                     </section>
                     <section>
                         <b-table
                             @dblclick="toggleEditVolume=true"
                             :selected.sync="selected"
+                            :checked-rows.sync="checkedRowsDelete"
+                            checkbox-position="right"
+                            checkable
                             focusable
                             paginated
                             :per-page="perPage"
@@ -90,6 +99,7 @@ export default {
     ],
     data: () => ({
         selected:null,
+        checkedRowsDelete:[],
         loading:false,
         toggleEditVolume:false,
         perPage:10,
@@ -137,6 +147,9 @@ export default {
         allocateSize:5,
     }),
     methods: {
+        bulkDelete(){
+            this.$emit('bulkDeleteVolumes',this.checkedRowsDelete);
+        },
         selectedToNull(){
             this.selected=null;
         },

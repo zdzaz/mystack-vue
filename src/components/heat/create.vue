@@ -182,14 +182,14 @@
                                         <span v-else>
                                             <div class="card-content">
                                                 <div class="columns">
-                                                    <b-field style="padding-top:45px" label="" class="file column">
-                                                        <b-upload v-model="templateFile" type="file" id="files" ref="files" @change="handleFileUpload()">
+                                                    <b-field disabled style="padding-top:45px" label="" class="file column">
+                                                        <b-upload disabled v-model="templateFile" type="file" id="files" ref="files" @change="handleFileUpload()">
                                                             <a class="button is-dark">
                                                                 <b-icon icon="upload"></b-icon>
                                                                 <span>Click to upload File</span>
                                                             </a>
                                                         </b-upload>
-                                                        <span class="file-name" v-if="templateFile">
+                                                        <span disabled class="file-name" v-if="templateFile">
                                                             {{ templateFile.name }}
                                                         </span>
                                                     </b-field>
@@ -270,9 +270,9 @@ export default {
             } else{
                 console.log(this.templateFile)
                 data.template_url = this.templateFile;
+                this.error("Error, please paste the template in the HOT box");
+                return;
             }
-
-            
 
             this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/heat-api/v1/'+this.user.project.id+'/stacks',data,
             {

@@ -40,22 +40,21 @@
           </div>
       
           <div class="columns">
-            
             <div class="column">
-              <apexchart width="300" :options="chartOptionsNetworkFixed" :series="seriesNetworkFixed"></apexchart>
+              <apexchart width="300" :options="chartOptionsNetworkFixed" :series="seriesNetwork"></apexchart>
             </div>
             <div class="column">
             </div>
             <div class="column">
-              <apexchart width="300" :options="chartOptionsNetworkFloating" :series="seriesNetworkFloating"></apexchart>
+              <apexchart width="300" :options="chartOptionsNetworkFloating" :series="seriesNetworFIP"></apexchart>
             </div>
             <div class="column">
             </div>
             <div class="column">
               <apexchart width="300" :options="chartOptionsVolumes" :series="seriesVolumes"></apexchart>
             </div>
-
           </div>
+          
       </section>
     </div>
     
@@ -220,7 +219,7 @@ export default {
     },
     
     // IP NETWORKS
-    seriesNetworkFixed:[],
+    seriesNetwork:[],
     chartOptionsNetworkFixed: {
       colors:["#f700a4"],
       chart: {
@@ -256,10 +255,10 @@ export default {
       stroke: {
         lineCap: "round"
       },
-      labels: ['Fixed IPs'],
+      labels: ['Networks'],
     },
 
-    seriesNetworkFloating:[],
+    seriesNetworFIP:[],
     chartOptionsNetworkFloating: {
       colors:["#f7e600"],
       chart: {
@@ -349,16 +348,38 @@ export default {
           }
         }).then(response => {
             this.quota_set = response.data.quota_set;
-            this.buildLimits();
             this.loading = false;
+            this.buildLimits();
         }).catch(error => {
             console.log(error)
             this.$toasted.error("No limits could be reached", { 
-                theme: "outline", 
-                position: "top-right", 
-                duration : 5000
-                });
-                this.loading = false;
+              theme: "outline", 
+              position: "top-right", 
+              duration : 5000
+            });
+            this.loading = false;
+        });
+    },
+    getQuotasNetwork(){
+      this.loading = true;
+      this.axios.get('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+':9696/v2.0/quotas/'+this.user.project.id+'/details.json',
+        {
+          headers: { 
+              'x-auth-token': this.user.token
+          }
+        }).then(response => {
+            this.quota_set_network = response.data.quota;
+            this.seriesNetwork.push(this.quota_set_network.network.used * 100 / this.quota_set_network.network.limit)
+            this.seriesNetworFIP.push(this.quota_set_network.floatingip.used * 100 / this.quota_set_network.floatingip.limit)
+            this.loading = false;
+        }).catch(error => {
+            console.log(error)
+            this.$toasted.error("No network quotas could be reached", { 
+              theme: "outline", 
+              position: "top-right", 
+              duration : 5000
+            });
+            this.loading = false;
         });
     },
     getQuotasVolume(){
@@ -369,19 +390,10 @@ export default {
               'x-auth-token': this.user.token
           }
         }).then((response) => {
-            console.log(response)
             this.seriesVolumes.push(response.data.limits.absolute.totalVolumesUsed * 100 / response.data.limits.absolute.maxTotalVolumes)
-
-            this.buildLimits();
             this.loading = false;
-        }).catch(error => {
-            console.log(error)
-            this.$toasted.error("No limits could be reached", { 
-                theme: "outline", 
-                position: "top-right", 
-                duration : 5000
-                });
-                this.loading = false;
+        }).catch(() => {
+            
         });
     },
     buildLimits(){
@@ -389,8 +401,6 @@ export default {
       this.seriesInstance.push(this.quota_set.instances.in_use * 100 / this.quota_set.instances.limit);
       this.seriesProcessRAM.push(this.quota_set.ram.in_use * 100 / this.quota_set.ram.limit);
       this.seriesProcessCores.push(this.quota_set.cores.in_use * 100 / this.quota_set.cores.limit);
-      this.seriesNetworkFixed.push(this.quota_set.fixed_ips.in_use * 100 / this.quota_set.fixed_ips.limit)
-      this.seriesNetworkFloating.push(this.quota_set.floating_ips.in_use * 100 / this.quota_set.floating_ips.limit)
     },
 
     // BAR CHART
@@ -436,6 +446,7 @@ export default {
   mounted(){
     this.getQuotas();
     this.getQuotasVolume();
+    this.getQuotasNetwork()
     this.getPerformanceInstances();
   },
 }

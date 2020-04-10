@@ -41,7 +41,7 @@
     </div>
     <div v-else>
       <span v-if="!loadingVolumes&&!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
-        <router-view :key="servers.length" @getImagesAgain="getImages" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
+        <router-view :key="servers.length" @bulkDeleteVolumes="deleteVolumes" @getImagesAgain="getImages" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
         <mynavbar :ip="ip" :user="user" :projects="projects" :servers="servers" @switchproject="switchProject"></mynavbar>
       </span>
       <span v-else>
@@ -479,7 +479,37 @@ export default {
         });
 
     },
-
+    deleteVolumes(volumes){
+      this.loading = true;
+      console.log(volumes)
+      volumes.forEach(vol=>{
+      this.axios.delete('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/volume/v3/'+this.user.project.id+'/volumes/'+vol.id+'',
+        {
+          headers: { 
+            'x-auth-token': this.user.token
+          }
+        }).then((response) => {
+          console.log(response)
+          this.volumes = this.volumes.filter(s => s.id !== vol.id);
+          this.loading = false;
+          this.$toasted.success("Volume deleted with success", { 
+                  theme: "outline", 
+                  position: "top-right", 
+                  duration : 5000
+              });
+          this.$forceUpdate();
+        }).catch(error => {
+          console.log(error)
+          this.$toasted.error("Could not delete Volume", { 
+              theme: "outline", 
+              position: "top-right", 
+              duration : 5000
+              });
+              this.loading = false;
+        });
+        this.$forceUpdate();
+      });
+    }
   },
   computed:{
     proceed() {
