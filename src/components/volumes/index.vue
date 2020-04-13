@@ -15,7 +15,7 @@
                     <section class="columns">
                         <b-field label="" class="column" style="align-content:right">
                         </b-field>
-                        <b-field  label="Filter by name" label-position='on-border' class="column">
+                        <b-field  label="Filter by size" label-position='on-border' class="column">
                             <b-input type="number" v-model="search_size"/>
                         </b-field>
                         <b-field label="Filter by ID" label-position='on-border' class="column">

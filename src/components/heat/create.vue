@@ -358,19 +358,19 @@ export default {
                 
             }
 
-
-            
-
-            console.log(data)
-
             this.axios.post('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+'/heat-api/v1/'+this.user.project.id+'/stacks',data,
             {
                 headers: { 
                     'x-auth-token': this.user.token,
                 }
-            }).then(response => {
-                    console.log(response);
-                    this.loading = false
+            }).then(() => {
+                    this.$router.push("/home/stacks");
+                    this.$toasted.success("Creating stack!", { 
+                    theme: "outline", 
+                    position: "top-right", 
+                    duration : 5000
+                });
+                this.loading = false
             }).catch(response => {
                 console.log(response);
                 var error_message = "Somethign went wrong trying to create stack...";

@@ -30,6 +30,8 @@ import Stacks from './components/heat/index.vue'
 import CreateStack from './components/heat/create.vue'
 import StackDetail from './components/heat/detail.vue'
 // import CreateFlavor from './components/flavors/create.vue'
+import Networks from './components/networks/index.vue'
+import CreateNetwork from './components/networks/create.vue'
 
 
 
@@ -93,6 +95,14 @@ const routes = [
   {
     path: '/home/stacks/create',
     component: CreateStack
+  },
+  {
+    path: '/home/networks',
+    component: Networks
+  },
+  {
+    path: '/home/networks/create',
+    component: CreateNetwork
   },
 ];
 

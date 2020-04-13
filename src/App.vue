@@ -41,7 +41,7 @@
     </div>
     <div v-else>
       <span v-if="!loadingVolumes&&!loadingEdit&&!loadingDeleteServer&&!loading&&!loadingFlavors&&!loadingHypervisors&&!loadingImages&&!loadingNetworks&&!loadingServers&&!loadingZones&&!loadingProjects&&!loadingProjectsSwitch">
-        <router-view :key="servers.length" @bulkDeleteVolumes="deleteVolumes" @getImagesAgain="getImages" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
+        <router-view :loadingApp="loading" :key="servers.length" @bulkDeleteNetworks="bulkDeleteNetworks" @bulkDeleteVolumes="deleteVolumes" @getNetworksAgain="getNetworks" @getImagesAgain="getImages" @getProjectsAgain="getProjects" @getVolumesAgain="getVolumesAgain" @getServersAgain="getServers" @editserver="editServer" @bulkDeleteServer="bulkDeleteServer" @deleteserver="deleteServer" :volumes="volumes" :availabilityZones="availabilityZones" :hypervisors="hypervisors" :images="images" :networks="networks" :flavors="flavors" :ip="ip" :user="user" :servers="servers"></router-view>
         <mynavbar :ip="ip" :user="user" :projects="projects" :servers="servers" @switchproject="switchProject"></mynavbar>
       </span>
       <span v-else>
@@ -501,6 +501,37 @@ export default {
         }).catch(error => {
           console.log(error)
           this.$toasted.error("Could not delete Volume", { 
+              theme: "outline", 
+              position: "top-right", 
+              duration : 5000
+              });
+              this.loading = false;
+        });
+        this.$forceUpdate();
+      });
+    },
+    bulkDeleteNetworks(networks){
+      this.loading = true;
+      console.log(networks)
+      networks.forEach(net=>{
+      this.axios.delete('http://'+this.ip[0]+'.'+this.ip[1]+'.'+this.ip[2]+'.'+this.ip[3]+':9696/v2.0/networks/'+net.id+'',
+        {
+          headers: { 
+            'x-auth-token': this.user.token
+          }
+        }).then((response) => {
+          console.log(response)
+          this.networks = this.networks.filter(s => s.id !== net.id);
+          this.loading = false;
+          this.$toasted.success("Network deleted with success", { 
+                  theme: "outline", 
+                  position: "top-right", 
+                  duration : 5000
+              });
+          this.$forceUpdate();
+        }).catch(error => {
+          console.log(error)
+          this.$toasted.error("Could not delete Network", { 
               theme: "outline", 
               position: "top-right", 
               duration : 5000

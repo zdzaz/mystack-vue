@@ -1,5 +1,6 @@
 <template>
-  <span>
+<span>
+  <span v-if="!loading&&!loadingApp">
     <section class="hero is-light is-bold">
       <div class="hero-body">
         <div class="container">
@@ -57,9 +58,11 @@
           
       </section>
     </div>
-    
-
   </span>
+  <span v-else>
+  </span>
+</span>
+  
 </template>
 
 <script>
@@ -70,7 +73,8 @@ export default {
   name: 'home',
   props:[
     'ip',
-    'user'
+    'user',
+    'loadingApp'
   ],
   data: () => ({
     loading:false,

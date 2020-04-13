@@ -69,6 +69,25 @@
                     </div>
                     <div class="navbar-item has-dropdown-up is-hoverable">
                         <a class="navbar-link">
+                        Networks
+                        </a>
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item" @click="networkList()">
+                                <i class=""><span class="material-icons">visibility</span></i>&nbsp;&nbsp;&nbsp;List
+                            </a>
+                            <!-- <a class="navbar-item">
+                               <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;Modify
+                            </a> -->
+                            <!-- <a class="navbar-item"  @click="networkCreate()">
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
+                            </a> -->
+                            <a class="navbar-item" style="opacity:50%">
+                                <i class=""><span class="material-icons">add</span></i>&nbsp;&nbsp;&nbsp;Create
+                            </a>
+                        </div>
+                    </div>
+                    <div class="navbar-item has-dropdown-up is-hoverable">
+                        <a class="navbar-link">
                         Images
                         </a>
                         <div class="navbar-dropdown">
@@ -83,6 +102,7 @@
                             </a>
                         </div>
                     </div>
+                    
                     <div class="navbar-item has-dropdown-up is-hoverable">
                         <a class="navbar-link">
                         Flavors
@@ -179,7 +199,12 @@ export default {
         stackCreate(){
             this.$router.push("/home/stacks/create");
         },
-
+        networkList(){
+            this.$router.push("/home/networks");
+        },
+        networkCreate(){
+            this.$router.push("/home/networks/create");
+        }
     },
     computed:{
         projectName() {
